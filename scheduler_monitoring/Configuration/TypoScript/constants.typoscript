@@ -1,0 +1,17 @@
+plugin.tx_schedulermonitoring_monitor {
+    view {
+        # cat=plugin.tx_schedulermonitoring_monitor/file; type=string; label=Path to template root (FE)
+        templateRootPath = EXT:scheduler_monitoring/Resources/Private/Templates/
+        # cat=plugin.tx_schedulermonitoring_monitor/file; type=string; label=Path to template partials (FE)
+        partialRootPath = EXT:scheduler_monitoring/Resources/Private/Partials/
+        # cat=plugin.tx_schedulermonitoring_monitor/file; type=string; label=Path to template layouts (FE)
+        layoutRootPath = EXT:scheduler_monitoring/Resources/Private/Layouts/
+    }
+    persistence {
+        # cat=plugin.tx_schedulermonitoring_monitor//a; type=string; label=Default storage PID
+        storagePid =
+    }
+    settings{
+        token = d5ee5b6897b34ea91b8c698d26860284d461097f
+    }
+}
