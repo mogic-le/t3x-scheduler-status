@@ -1,5 +1,5 @@
 <?php
-namespace Mogic\SchedulerMonitoring\Controller;
+namespace Mogic\Typo3SchedulerMonitoring\Controller;
 
 
 
@@ -24,7 +24,7 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     /**
      * tokenMiddleware
      *
-     * @var \Mogic\SchedulerMonitoring\Middleware\TokenMiddleware
+     * @var \Mogic\Typo3SchedulerMonitoring\Middleware\TokenMiddleware
      */
     protected $tokenMiddleware = null;
 
@@ -32,22 +32,22 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     /**
      * sqlService
      *
-     * @var \Mogic\SchedulerMonitoring\Service\SqlService
+     * @var \Mogic\Typo3SchedulerMonitoring\Service\SqlService
      */
     protected $sqlService = null;
 
     /**
-     * @param \Mogic\SchedulerMonitoring\Middleware\TokenMiddleware $tokenMiddleware
+     * @param \Mogic\Typo3SchedulerMonitoring\Middleware\TokenMiddleware $tokenMiddleware
      */
-    public function injectTokenMiddleware(\Mogic\SchedulerMonitoring\Middleware\TokenMiddleware $tokenMiddleware)
+    public function injectTokenMiddleware(\Mogic\Typo3SchedulerMonitoring\Middleware\TokenMiddleware $tokenMiddleware)
     {
         $this->tokenMiddleware = $tokenMiddleware;
     }
 
     /**
-     * @param \Mogic\SchedulerMonitoring\Service\SqlService $sqlService
+     * @param \Mogic\Typo3SchedulerMonitoring\Service\SqlService $sqlService
      */
-    public function injectSqlService(\Mogic\SchedulerMonitoring\Service\SqlService $sqlService)
+    public function injectSqlService(\Mogic\Typo3SchedulerMonitoring\Service\SqlService $sqlService)
     {
         $this->sqlService = $sqlService;
     }
@@ -66,6 +66,7 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         } else {
             $response = ['status'=>1,'response'=>[]];
             $serverInfo = ['server_time'=>$GLOBALS['EXEC_TIME'],'server_timezone'=>date_default_timezone_get()];
+
             $schedulerTasks = $this->sqlService->select('tx_scheduler_task', ['*'], ['deleted' => 0]);
             foreach ($schedulerTasks as $schedulerTask) {
 

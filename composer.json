@@ -1,5 +1,5 @@
 {
-    "name": "mogic/scheduler-monitoring",
+    "name": "mogic/typo3-scheduler-monitoring",
     "type": "typo3-cms-extension",
     "description": "",
     "authors": [],
@@ -13,16 +13,16 @@
     },
     "autoload": {
         "psr-4": {
-            "Mogic\\SchedulerMonitoring\\": "Classes"
+            "Mogic\\Typo3SchedulerMonitoring\\": "Classes"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Mogic\\SchedulerMonitoring\\Tests\\": "Tests"
+            "Mogic\\Typo3SchedulerMonitoring\\Tests\\": "Tests"
         }
     },
     "replace": {
-        "typo3-ter/scheduler-monitoring": "self.version"
+        "typo3-ter/typo3-scheduler-monitoring": "self.version"
     },
     "config": {
         "vendor-dir": ".Build/vendor",
@@ -37,7 +37,7 @@
         "typo3/cms": {
             "cms-package-dir": "{$vendor-dir}/typo3/cms",
             "web-dir": ".Build/public",
-            "extension-key": "scheduler_monitoring"
+            "extension-key": "typo3_scheduler_monitoring"
         }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mogic\SchedulerMonitoring\Service;
+namespace Mogic\Typo3SchedulerMonitoring\Service;
 
 
 use \TYPO3\CMS\Core\Utility\GeneralUtility;

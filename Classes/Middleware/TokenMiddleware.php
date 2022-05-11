@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Mogic\SchedulerMonitoring\Middleware;
+namespace Mogic\Typo3SchedulerMonitoring\Middleware;
 
 class TokenMiddleware{
 
