@@ -1,5 +1,5 @@
 {
-    "name": "mogic/scheduler-status",
+    "name": "mogic/t3x-scheduler-status",
     "type": "typo3-cms-extension",
     "description": "API to monitor scheduler task execution status",
     "authors": [
