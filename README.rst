@@ -13,7 +13,7 @@ Setup
 -----
 1. Install this extension::
 
-     $ composer require mogic/scheduler-status
+     $ composer require mogic/t3x-scheduler-status
 2. Include the TypoScript template "Scheduler status" into your root
    TypoScript template
 3. Configure the API key in the TypoScript constants
