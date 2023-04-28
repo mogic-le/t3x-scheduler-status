@@ -3,9 +3,20 @@
     "type": "typo3-cms-extension",
     "description": "API to monitor scheduler task execution status",
     "authors": [
+        {
+            "name": "Ibnel Plancic",
+            "role": "Developer",
+            "email": "ibnel@kibernetika.de"
+        },
+        {
+            "name": "Christian Weiske",
+            "role": "Developer",
+            "email": "weiske@mogic.com"
+        }
     ],
     "license": "GPL-2.0-or-later",
     "require": {
+        "typo3/cms-core": "^10.4 || ^11.5",
         "typo3/cms-scheduler": "^10.4 || ^11.5"
     },
     "autoload": {
