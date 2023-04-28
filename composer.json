@@ -1,43 +1,21 @@
 {
-    "name": "mogic/typo3-scheduler-monitoring",
+    "name": "mogic/scheduler-status",
     "type": "typo3-cms-extension",
-    "description": "",
-    "authors": [],
+    "description": "API to monitor scheduler task execution status",
+    "authors": [
+    ],
     "license": "GPL-2.0-or-later",
     "require": {
-        "typo3/cms-core": "^10.4 || ^11.5",
         "typo3/cms-scheduler": "^10.4 || ^11.5"
-    },
-    "require-dev": {
-        "typo3/testing-framework": "^6.9.0"
     },
     "autoload": {
         "psr-4": {
-            "Mogic\\Typo3SchedulerMonitoring\\": "Classes"
+            "Mogic\\SchedulerStatus\\": "Classes"
         }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Mogic\\Typo3SchedulerMonitoring\\Tests\\": "Tests"
-        }
-    },
-    "replace": {
-        "typo3-ter/typo3-scheduler-monitoring": "self.version"
-    },
-    "config": {
-        "vendor-dir": ".Build/vendor",
-        "bin-dir": ".Build/bin"
-    },
-    "scripts": {
-        "post-autoload-dump": [
-            "TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
-        ]
     },
     "extra": {
         "typo3/cms": {
-            "cms-package-dir": "{$vendor-dir}/typo3/cms",
-            "web-dir": ".Build/public",
-            "extension-key": "typo3_scheduler_monitoring"
+            "extension-key": "scheduler_status"
         }
     }
 }

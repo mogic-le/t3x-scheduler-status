@@ -1,16 +1,16 @@
-plugin.tx_typo3schedulermonitoring_monitor {
+plugin.tx_schedulerstatus {
     settings {
-        token = {$plugin.tx_typo3schedulermonitoring_monitor.settings.token}
+        token = {$plugin.tx_schedulerstatus.settings.token}
     }
 }
 
-scheduler_monitoring_json_response = PAGE
-scheduler_monitoring_json_response {
+scheduler_status_json_response = PAGE
+scheduler_status_json_response {
     typeNum = 9251355215
     10 = USER
     10 {
         userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
-        extensionName = Typo3SchedulerMonitoring
+        extensionName = SchedulerStatus
         pluginName = Monitor
         vendorName = Mogic
     }

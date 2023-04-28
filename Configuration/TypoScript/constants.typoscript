@@ -1,6 +1,6 @@
-plugin.tx_typo3schedulermonitoring_monitor {
+plugin.tx_schedulerstatus {
     settings {
-        # cat=plugin.tx_typo3schedulermonitoring_monitor; type=string; label=API token
+        # cat=plugin.tx_schedulerstatus; type=string; label=API token
         token = d5ee5b6897b34ea91b8c698d26860284d461097f
     }
 }
