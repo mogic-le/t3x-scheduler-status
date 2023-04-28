@@ -1,17 +1,6 @@
 plugin.tx_typo3schedulermonitoring_monitor {
-    view {
-        # cat=plugin.tx_typo3schedulermonitoring_monitor/file; type=string; label=Path to template root (FE)
-        templateRootPath = EXT:typo3_scheduler_monitoring/Resources/Private/Templates/
-        # cat=plugin.tx_typo3schedulermonitoring_monitor/file; type=string; label=Path to template partials (FE)
-        partialRootPath = EXT:typo3_scheduler_monitoring/Resources/Private/Partials/
-        # cat=plugin.tx_typo3schedulermonitoring_monitor/file; type=string; label=Path to template layouts (FE)
-        layoutRootPath = EXT:typo3_scheduler_monitoring/Resources/Private/Layouts/
-    }
-    persistence {
-        # cat=plugin.tx_typo3schedulermonitoring_monitor//a; type=string; label=Default storage PID
-        storagePid =
-    }
-    settings{
+    settings {
+        # cat=plugin.tx_typo3schedulermonitoring_monitor; type=string; label=API token
         token = d5ee5b6897b34ea91b8c698d26860284d461097f
     }
 }
