@@ -1,223 +1,150 @@
 <?php
-namespace Mogic\Typo3SchedulerMonitoring\Controller;
+namespace Mogic\SchedulerStatus\Controller;
 
-
-
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-/***
- *
- * This file is part of the "Scheduler Monitoring" Extension for TYPO3 CMS.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- *  (c) 2019
- *
- ***/
 
 /**
- * Monitor
+ * JSON API to monitor TYPO3 scheduler tasks status
  */
 class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
+    protected $defaultViewObjectName = \TYPO3\CMS\Extbase\Mvc\View\JsonView::class;
 
     /**
-     * tokenMiddleware
-     *
-     * @var \Mogic\Typo3SchedulerMonitoring\Middleware\TokenMiddleware
+     * Determine the scheduler status
      */
-    protected $tokenMiddleware = null;
-
-
-    /**
-     * sqlService
-     *
-     * @var \Mogic\Typo3SchedulerMonitoring\Service\SqlService
-     */
-    protected $sqlService = null;
-
-    /**
-     * @param \Mogic\Typo3SchedulerMonitoring\Middleware\TokenMiddleware $tokenMiddleware
-     */
-    public function injectTokenMiddleware(\Mogic\Typo3SchedulerMonitoring\Middleware\TokenMiddleware $tokenMiddleware)
+    public function listAction(): void
     {
-        $this->tokenMiddleware = $tokenMiddleware;
-    }
-
-    /**
-     * @param \Mogic\Typo3SchedulerMonitoring\Service\SqlService $sqlService
-     */
-    public function injectSqlService(\Mogic\Typo3SchedulerMonitoring\Service\SqlService $sqlService)
-    {
-        $this->sqlService = $sqlService;
-    }
-
-
-    /**
-     * action list
-     *
-     * @return string
-     */
-    public function listAction()
-    {
-        if (!$this->tokenMiddleware->checkRequestSecurityToken($this->settings['token'])) {
-            // Return message for invalid token or not set
-            $response = ['status' => 0, 'response' => "the Security Token included in the Request in Invalid or not set"];
-        } else {
-            $response = ['status'=>1,'response'=>[]];
-            $serverInfo = ['server_time'=>$GLOBALS['EXEC_TIME'],'server_timezone'=>date_default_timezone_get()];
-
-            $schedulerTasks = $this->sqlService->select('tx_scheduler_task', ['*'], ['deleted' => 0]);
-            foreach ($schedulerTasks as $schedulerTask) {
-
-                $taskGroupInfo = ['uid'=>$schedulerTask['task_group'],'name'=>''];
-                $taskInfo = $this->getTaskInfo($schedulerTask);
-
-                if($schedulerTask['task_group']){
-                    $taskGroupInfo['name'] = $this->getTaskGroupInfo($schedulerTask['task_group']);
-                }
-                $taskStatus = $this->getTaskStatus(unserialize($schedulerTask['lastexecution_failure']));
-
-                $response['response'][]=$this->mapSchedulerTaskFieldsForResponse($schedulerTask,$taskInfo,$taskStatus,$taskGroupInfo,$serverInfo);
-
-            }
+        if (!$this->verifySecurityToken()) {
+            $this->view->setVariablesToRender(['error', 'status']);
+            $this->view->assign('status', 'error');
+            $this->view->assign('error', 'Wrong API token');
+            $this->response->setStatus(403);
+            return;
         }
-        return json_encode($response);
-    }
 
+        $titles = $this->getTaskTitles();
 
-    protected function mapSchedulerTaskFieldsForResponse($schedulerFields,$taskInfo,$taskStatus,$taskGroupInfo,$serverInfo){
-        return [
-            'uid' => $schedulerFields['uid'],
-            'name' => $taskInfo['title'],
-            'description' => $taskInfo['description'],
-            'disabled' => $schedulerFields['disable'],
-            'class' => $taskInfo['class'],
-            'task_group' => $taskGroupInfo,
-            'extension' => $taskInfo['class'],
-            'frequency' => $taskInfo['frequency'],// Integer
-            'type' => $taskInfo['type'],
-            'parallel_execution' => boolval($taskInfo['multiple']),
-            'late'=>$taskInfo['late'],
-            'is_running'=>$taskInfo['is_running'],
-            'last_execution'=>$schedulerFields['lastexecution'],
-            'lastexecution_context'=>$schedulerFields['lastexecution_context'], // CLI or BE
-            'next_execution'=>$schedulerFields['nextexecution'],
-            'status'=>$taskStatus['status'], // 0 - 1
-            'last_execution_data'=>$taskStatus['last_execution_data'],
-            'server_time'=>$serverInfo['server_time'],
-            'server_timezone'=>$serverInfo['server_timezone'],
+        $schedulerTasks = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('tx_scheduler_task')
+            ->select(
+                ['*'],
+                'tx_scheduler_task',
+                ['deleted' => 0]
+            )->fetchAll();
+
+        $late     = 0;
+        $disabled = 0;
+        $errored  = 0;
+
+        $tasksInfo = [];
+        foreach ($schedulerTasks as $taskRow) {
+            if ($taskRow['late']) {
+                $late++;
+            }
+            if ($taskRow['disable']) {
+                $disabled++;
+            }
+            $taskObject = unserialize($taskRow['serialized_task_object']);
+            $task = [
+                'id'          => $taskRow['uid'],
+                'name'        => $titles[get_class($taskObject)] ?? null,
+                'description' => $taskRow['description'],
+                'disabled'    => (bool) $taskRow['disable'],
+                'group'       => null,
+                'groupid'     => $taskRow['task_group'],
+
+                'late'        => $taskRow['nextexecution'] < $GLOBALS['EXEC_TIME'],
+                'running'     => !empty($taskRow['serialized_executions']),
+
+                'last'        => $taskRow['lastexecution'] === null
+                    ? null : date('c', $taskRow['lastexecution']),
+                'lasterror'   => null,
+                'lastsuccess' => true,
+
+                'next'        => date('c', $taskRow['nextexecution']),
             ];
+            if ($task['lastexecution_failure']) {
+                $failInfo = unserialize($task['lastexecution_failure']);
+                $task['lasterror'] = $failInfo['message'];
+                $task['success']   = false;
+                $errored++;
+            }
+            $tasksInfo[] = $task;
+        }
+        $this->loadGroupNames($tasksInfo);
+
+        $response = [
+            'status'   => $errored > 0 ? 'error' : ($late > 0 ? 'late' : 'ok'),
+            'errored'  => $errored,
+            'late'     => $late,
+            'disabled' => $disabled,
+            'tasks'    => $tasksInfo
+        ];
+
+        $this->view->assignMultiple($response);
+        $this->view->setVariablesToRender(array_keys($response));
     }
 
     /**
-     * This method fetches a list of all classes that have been registered with the Scheduler
-     * For each item the following information is provided, as an associative array:
+     * Load all titles for the scheduler tasks
      *
-     * ['extension']	=>	Key of the extension which provides the class
-     * ['filename']		=>	Path to the file containing the class
-     * ['title']		=>	String (possibly localized) containing a human-readable name for the class
-     * ['provider']		=>	Name of class that implements the interface for additional fields, if necessary
-     *
-     * The name of the class itself is used as the key of the list array
-     *
-     * @return array List of registered classes
+     * @return string[] List of task titles. Key is the scheduler task class name
      */
-    protected function getRegisteredClasses(): array
+    protected function getTaskTitles(): array
     {
-        $list = [];
-        $title = $description = '';
-        foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'] ?? [] as $class => $registrationInformation) {
-            if(isset($registrationInformation['title'])){
-                if(substr( $registrationInformation['title'], 0, 4 ) === "LLL:"){
-                    $title = LocalizationUtility::translate($registrationInformation['title'],'');
-                }else{
+        $tasks  = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'] ?? [];
+        $titles = [];
+        foreach ($tasks as $class => $registrationInformation) {
+            $title = null;
+            if (isset($registrationInformation['title'])) {
+                if (substr($registrationInformation['title'], 0, 4) === 'LLL:') {
+                    $title = LocalizationUtility::translate($registrationInformation['title'], '');
+                } else {
                     $title = $registrationInformation['title'];
                 }
             }
-
-            if(isset($registrationInformation['description'])){
-                if(substr( $registrationInformation['description'], 0, 4 ) === "LLL:"){
-                    $description = LocalizationUtility::translate($registrationInformation['description'],'');
-                }else{
-                    $description = $registrationInformation['description'];
-                }
-            }
-            $list[$class] = [
-                'extension' => $registrationInformation['extension'],
-                'title' => $title,
-                'description' => $description,
-                'provider' => $registrationInformation['additionalFields'] ?? '',
-            ];
+            $titles[$class] = $title;
         }
-        return $list;
+        return $titles;
     }
 
-    protected function getTaskInfo($schedulerTask){
-        $task = unserialize($schedulerTask['serialized_task_object']);
+    /**
+     * Load "group" names into the tasks
+     *
+     * @param array $tasksInfo Array of collected tasks with "groupid" column
+     */
+    protected function loadGroupNames(array &$tasksInfo): void
+    {
+        $builder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('tx_scheduler_task_group')
+            ->createQueryBuilder();
+        $groupRows = $builder->select('uid', 'groupName')
+            ->from('tx_scheduler_task_group')
+            ->where(
+                $builder->expr()->in('uid', array_column($tasksInfo, 'groupid'))
+            )
+            ->execute()
+            ->fetchAllKeyValue();
 
-        $registeredClasses = $this->getRegisteredClasses();
-        $schedulerClass = $registeredClasses[get_class($task)];
-
-        $taskInfo = [];
-        if (isset($schedulerClass)) {
-            $taskInfo['class'] = get_class($task);
-            $taskInfo['title'] = $schedulerClass['title'];
-            $taskInfo['description'] = $schedulerClass['description'];
-            $taskInfo['extension'] = $schedulerClass['extension'];
-            $taskInfo['late'] = FALSE;
-            $taskInfo['is_running'] = FALSE;
-            if (!empty($schedulerTask['serialized_executions'])) {
-                $taskInfo['is_running'] = TRUE;
-            }
-            if (!empty($schedulerTask['nextexecution'])) {
-                if ($schedulerTask['nextexecution'] < $GLOBALS['EXEC_TIME']){
-                    $taskInfo['late'] = TRUE;
-                }
-            }
-
-            // Get execution information
-            $taskInfo['start'] = (int)$task->getExecution()->getStart();
-            $taskInfo['end'] = (int)$task->getExecution()->getEnd();
-            $taskInfo['interval'] = $task->getExecution()->getInterval();
-            $taskInfo['croncmd'] = $task->getExecution()->getCronCmd();
-            $taskInfo['multiple'] = $task->getExecution()->getMultiple();
-            if (!empty($taskInfo['interval']) || !empty($taskInfo['croncmd'])) {
-                $taskInfo['type'] = 'recurring';
-                $taskInfo['frequency'] = $taskInfo['interval'] ?: $taskInfo['croncmd'];
-            } else {
-                $taskInfo['type'] = 'single';
-                $taskInfo['frequency'] = '';
-                $taskInfo['end'] = 0;
-            }
+        foreach ($tasksInfo as $key => $task) {
+            $tasksInfo[$key]['group'] = $groupRows[$task['groupid']] ?? null;
         }
-        return $taskInfo;
     }
 
-
-    protected function getTaskStatus($lastExecutionData){
-        $lastExecutionInfo = ['status'=>0,'last_execution_data'=>[]];
-        if($lastExecutionData == NULL){
-            $lastExecutionInfo['status'] = 1;
-        }else{
-            $lastExecutionInfo['status'] = 0;
-            $lastExecutionInfo['last_execution_data'] = [
-                'code' => $lastExecutionData['code'],
-                'message' => $lastExecutionData['message'],
-                'file' => $lastExecutionData['file'],
-                'line' => $lastExecutionData['line'],
-                'trace' => $lastExecutionData['trace'],
-            ];
+    /**
+     * Check if the configured API token is provided in the request
+     */
+    public function verifySecurityToken(): bool
+    {
+        //we use $_GET because the token name is not prefixed with our extension key
+        if (isset($_GET['token'])) {
+            return $_GET['token'] == $this->settings['token'];
         }
-        return $lastExecutionInfo;
-    }
 
-    protected function getTaskGroupInfo($taskGroupUid){
-        $schedulerTaskGroup = $this->sqlService->select('tx_scheduler_task_group', ['*'], ['uid' => $taskGroupUid]);
-        if($schedulerTaskGroup){
-            return $schedulerTaskGroup[0]['groupName'];
-        }
-        return null;
+        return false;
     }
 
 }
