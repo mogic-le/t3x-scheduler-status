@@ -41,12 +41,6 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 
         $tasksInfo = [];
         foreach ($schedulerTasks as $taskRow) {
-            if ($taskRow['late']) {
-                $late++;
-            }
-            if ($taskRow['disable']) {
-                $disabled++;
-            }
             $taskObject = unserialize($taskRow['serialized_task_object']);
             $task = [
                 'id'          => $taskRow['uid'],
@@ -72,6 +66,14 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 $task['success']   = false;
                 $errored++;
             }
+
+            if ($task['disabled']) {
+                $disabled++;
+            }
+            if ($task['late']) {
+                $late++;
+            }
+
             $tasksInfo[] = $task;
         }
         $this->loadGroupNames($tasksInfo);
