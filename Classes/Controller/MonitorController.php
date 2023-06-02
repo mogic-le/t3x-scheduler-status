@@ -60,7 +60,9 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 
                 'next'        => date('c', $taskRow['nextexecution']),
             ];
-            if ($taskRow['lastexecution_failure'] !== '') {
+            if ($taskRow['lastexecution_failure'] !== null
+                && $taskRow['lastexecution_failure'] !== ''
+            ) {
                 $failInfo = unserialize($taskRow['lastexecution_failure']);
                 $task['lasterror'] = $failInfo['message'];
                 $task['success']   = false;
