@@ -53,15 +53,15 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 'late'        => $taskRow['nextexecution'] < $GLOBALS['EXEC_TIME'],
                 'running'     => !empty($taskRow['serialized_executions']),
 
-                'last'        => $taskRow['lastexecution'] === null
-                    ? null : date('c', $taskRow['lastexecution']),
+                'last'        => $taskRow['lastexecution_time'] === null
+                    ? null : date('c', $taskRow['lastexecution_time']),
                 'lasterror'   => null,
                 'lastsuccess' => true,
 
                 'next'        => date('c', $taskRow['nextexecution']),
             ];
-            if ($task['lastexecution_failure']) {
-                $failInfo = unserialize($task['lastexecution_failure']);
+            if ($taskRow['lastexecution_failure'] !== '') {
+                $failInfo = unserialize($taskRow['lastexecution_failure']);
                 $task['lasterror'] = $failInfo['message'];
                 $task['success']   = false;
                 $errored++;
