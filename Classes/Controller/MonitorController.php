@@ -71,6 +71,8 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 
             if ($task['disabled']) {
                 $disabled++;
+                //disabled tasks are not late by definition
+                $task['late'] = false;
             }
             if ($task['late']) {
                 $late++;
