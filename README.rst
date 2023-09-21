@@ -5,7 +5,7 @@ This TYPO3 extension provides a simple JSON API route that
 returns the scheduler status:
 
 - Overview status field if everything is fine
-- How many tasks failed, are late and disabled
+- How many tasks failed, are late, disabled and running
 - Detailled information about each task
 
 
@@ -35,6 +35,7 @@ Example response::
     "status": "ok",
     "errored": 0,
     "late": 0,
+    "running": 0,
     "disabled": 0,
     "tasks": [
       {

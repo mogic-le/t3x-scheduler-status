@@ -38,6 +38,7 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $late     = 0;
         $disabled = 0;
         $errored  = 0;
+        $running  = 0;
 
         $tasksInfo = [];
         foreach ($schedulerTasks as $taskRow) {
@@ -77,6 +78,9 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             if ($task['late']) {
                 $late++;
             }
+            if ($task['running']) {
+                $running++;
+            }
 
             $tasksInfo[] = $task;
         }
@@ -94,6 +98,7 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             'status'   => $status,
             'errored'  => $errored,
             'late'     => $late,
+            'running'  => $running,
             'disabled' => $disabled,
             'tasks'    => $tasksInfo
         ];
