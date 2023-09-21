@@ -2,11 +2,14 @@ TYPO3 scheduler status API
 ==========================
 
 This TYPO3 extension provides a simple JSON API route that
-returns the scheduler status:
+returns the `scheduler`__ status:
 
 - Overview status field if everything is fine
 - How many tasks failed, are late, disabled and running
 - Detailled information about each task
+
+
+__ https://docs.typo3.org/c/typo3/cms-scheduler/11.5/en-us/Index.html
 
 
 Setup
