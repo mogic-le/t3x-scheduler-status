@@ -39,6 +39,7 @@ Example response::
     "errored": 0,
     "late": 0,
     "running": 0,
+    "longrunning": 0,
     "disabled": 0,
     "tasks": [
       {
@@ -58,8 +59,16 @@ Example response::
     ]
   }
 
-The ``status`` field may be:
+Field explanation:
 
-- ``error`` when one of the tasks had an error in their last run
-- ``late`` when one task was not started as planned
-- ``ok`` when all is fine
+``status``
+  Possible values:
+
+  - ``error`` when one of the tasks had an error in their last run
+  - ``late`` when one task was not started as planned
+  - ``ok`` when all is fine
+
+``running``
+  Number of tasks that are currently running.
+``longrunning``
+  Number of tasks that are still running and should have been started again already.

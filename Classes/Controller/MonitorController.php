@@ -35,10 +35,11 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 ['deleted' => 0]
             )->fetchAll();
 
-        $late     = 0;
-        $disabled = 0;
-        $errored  = 0;
-        $running  = 0;
+        $late        = 0;
+        $disabled    = 0;
+        $errored     = 0;
+        $running     = 0;
+        $longRunning = 0;
 
         $tasksInfo = [];
         foreach ($schedulerTasks as $taskRow) {
@@ -81,6 +82,9 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             if ($task['running']) {
                 $running++;
             }
+            if ($task['late'] && $task['running']) {
+                $longRunning++;
+            }
 
             $tasksInfo[] = $task;
         }
@@ -95,12 +99,13 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         }
 
         $response = [
-            'status'   => $status,
-            'errored'  => $errored,
-            'late'     => $late,
-            'running'  => $running,
-            'disabled' => $disabled,
-            'tasks'    => $tasksInfo
+            'status'      => $status,
+            'errored'     => $errored,
+            'late'        => $late,
+            'running'     => $running,
+            'longrunning' => $longRunning,
+            'disabled'    => $disabled,
+            'tasks'       => $tasksInfo
         ];
 
         $this->view->assignMultiple($response);
