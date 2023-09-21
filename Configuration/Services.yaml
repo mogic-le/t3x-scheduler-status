@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Mogic\SchedulerStatus\:
+    resource: '../Classes/*'
+
+  Mogic\SchedulerStatus\Command\LongRunningTask:
+    tags:
+      - name: 'console.command'
+        command: 'scheduler:test:long'
