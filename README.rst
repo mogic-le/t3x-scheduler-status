@@ -56,6 +56,6 @@ Example response::
 
 The ``status`` field may be:
 
-- ``ok`` when all is fine
 - ``error`` when one of the tasks had an error in their last run
 - ``late`` when one task was not started as planned
+- ``ok`` when all is fine

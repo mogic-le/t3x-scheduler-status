@@ -82,8 +82,16 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         }
         $this->loadGroupNames($tasksInfo);
 
+        if ($errored > 0) {
+            $status = 'error';
+        } else if ($late > 0) {
+            $status = 'late';
+        } else {
+            $status = 'ok';
+        }
+
         $response = [
-            'status'   => $errored > 0 ? 'error' : ($late > 0 ? 'late' : 'ok'),
+            'status'   => $status,
             'errored'  => $errored,
             'late'     => $late,
             'disabled' => $disabled,
