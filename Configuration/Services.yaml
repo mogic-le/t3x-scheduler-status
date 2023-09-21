@@ -11,3 +11,8 @@ services:
     tags:
       - name: 'console.command'
         command: 'scheduler:test:long'
+
+  Mogic\SchedulerStatus\Command\FailTask:
+    tags:
+      - name: 'console.command'
+        command: 'scheduler:test:fail'
