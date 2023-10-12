@@ -54,7 +54,8 @@ Example response::
         "last": null,
         "lasterror": null,
         "lastsuccess": false,
-        "next": "2023-04-29T08:31:22+02:00"
+        "next": "2023-04-29T08:31:22+02:00",
+        "next_seconds": 600
       }
     ]
   }
@@ -72,3 +73,6 @@ Field explanation:
   Number of tasks that are currently running.
 ``longrunning``
   Number of tasks that are still running and should have been started again already.
+``next_seconds``
+  Number of seconds when the task will be running in.
+  Negative if it should have started already but could not because it's still running.

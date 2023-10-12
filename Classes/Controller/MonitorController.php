@@ -35,6 +35,8 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 ['deleted' => 0]
             )->fetchAll();
 
+        $now = time();
+
         $late        = 0;
         $disabled    = 0;
         $errored     = 0;
@@ -61,7 +63,8 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 'lasterror'   => null,
                 'lastsuccess' => true,
 
-                'next'        => date('c', $taskRow['nextexecution']),
+                'next'         => date('c', $taskRow['nextexecution']),
+                'next_seconds' => $taskRow['nextexecution'] - $now,
             ];
             if ($taskRow['lastexecution_failure'] !== null
                 && $taskRow['lastexecution_failure'] !== ''
