@@ -67,8 +67,8 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 && $taskRow['lastexecution_failure'] !== ''
             ) {
                 $failInfo = unserialize($taskRow['lastexecution_failure']);
-                $task['lasterror'] = $failInfo['message'];
-                $task['success']   = false;
+                $task['lasterror']   = $failInfo['message'];
+                $task['lastsuccess'] = false;
                 $errored++;
             }
 
