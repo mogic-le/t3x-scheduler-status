@@ -56,6 +56,7 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 'running'     => !empty($taskRow['serialized_executions']),
 
                 'last'        => $taskRow['lastexecution_time'] === null
+                    || $taskRow['lastexecution_time'] === 0
                     ? null : date('c', $taskRow['lastexecution_time']),
                 'lasterror'   => null,
                 'lastsuccess' => true,
