@@ -1,6 +1,7 @@
 <?php
 namespace Mogic\SchedulerStatus\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
@@ -15,14 +16,13 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     /**
      * Determine the scheduler status
      */
-    public function listAction(): void
+    public function listAction(): ResponseInterface
     {
         if (!$this->verifySecurityToken()) {
             $this->view->setVariablesToRender(['error', 'status']);
             $this->view->assign('status', 'error');
             $this->view->assign('error', 'Wrong API token');
-            $this->response->setStatus(403);
-            return;
+            return $this->jsonResponse()->withStatus(403);
         }
 
         $titles = $this->getTaskTitles();
@@ -114,6 +114,7 @@ class MonitorController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 
         $this->view->assignMultiple($response);
         $this->view->setVariablesToRender(array_keys($response));
+        return $this->jsonResponse();
     }
 
     /**

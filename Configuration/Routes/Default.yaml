@@ -1,0 +1,5 @@
+routeEnhancers:
+  PageTypeSuffix:
+    type: PageType
+    map:
+      scheduler-status.json: 9251355215

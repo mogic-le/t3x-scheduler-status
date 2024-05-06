@@ -14,7 +14,7 @@ class FailTask extends \Symfony\Component\Console\Command\Command
         $this->setDescription('Simply fail with an exception. Used for testing.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         throw new \Exception('FailTask fail message', 500);
     }

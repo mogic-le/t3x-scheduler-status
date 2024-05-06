@@ -20,14 +20,21 @@ Setup
 2. Include the TypoScript template "Scheduler status" into your root
    TypoScript template
 3. Configure the API key in the TypoScript constants
-4. Fetch the scheduler status::
+4. Include the routing configuration in your ``config/sites/*/config.yaml``::
 
-     http://typo3.example.org/?type=9251355215&token=mysecret
+     imports:
+       - { resource: 'EXT:scheduler_status/Configuration/Routes/Default.yaml' }
+
+5. Fetch the scheduler status::
+
+     http://typo3.example.org/scheduler-status.json?token=mysecret
 
 
 TYPO3
 -----
-TYPO3 10 and 11 are supported
+TYPO3 v11 and v12 are supported with v0.3.
+
+TYPO3 v10 was supported up to v0.2.
 
 
 API response

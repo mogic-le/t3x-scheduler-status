@@ -21,7 +21,7 @@ class LongRunningTask extends \Symfony\Component\Console\Command\Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $seconds = $input->getArgument('seconds');
         sleep($seconds);
